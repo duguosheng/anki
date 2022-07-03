@@ -135,7 +135,11 @@ export class CardParser extends BaseParser {
    * @private
    */
   async linesToHtml(lines: string[]) {
-    const string = lines.join("\n");
+    const string = lines.join("\n")
+      // $$\{1,2\}$$ => $$\\{1,2\\}$$
+      .replace(/\$\$\n?(.+?)\n?\$\$/g, str => str.replace(/(\\[{}])/g, "\\$1"))
+      // $\{1,2\}$ => $\\{1,2\\}$      (sd = single dollar)
+      .replace(/(?<sd>(?<!\$)\$(?!\$))(.+?)\k<sd>/g, str => str.replace(/(\\[{}])/g, "\\$1"));
 
     const mdString = await new MdParser({}).parse(string);
     if (!this.options.convertMath) {
