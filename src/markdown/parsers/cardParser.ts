@@ -144,7 +144,6 @@ export class CardParser extends BaseParser {
       // $\{1,2\} \%100$ => $\\{1,2\\} \\%100$
       .replace(/(?<![\\$])\$(?!\$).+?(?<!\\)\$/g, fixLatex);
 
-    console.log(string);
     const mdString = await new MdParser({}).parse(string);
     if (!this.options.convertMath) {
       return mdString;
