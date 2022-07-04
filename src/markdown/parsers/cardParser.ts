@@ -135,12 +135,16 @@ export class CardParser extends BaseParser {
    * @private
    */
   async linesToHtml(lines: string[]) {
+    const fixLatex = (match: string) => (
+      match.replace(/\\[{}%#&$_\\]/g, str => str === "\\\\" ? "\\\\\\\\" : "\\" + str)
+    );
     const string = lines.join("\n")
       // $$\{1,2\} \%100$$ => $$\\{1,2\\} \\%100$$
-      .replace(/(?<!\\)\$\$\n?(.+?)\n?(?<!\\)\$\$/g, str => str.replace(/(\\[{}%#&$_])/g, "\\$1"))
+      .replace(/(?<!\\)\$\$\n?.+?\n?(?<!\\)\$\$/g, fixLatex)
       // $\{1,2\} \%100$ => $\\{1,2\\} \\%100$
-      .replace(/(?<![\\$])\$(?!\$)(.+?)(?<!\\)\$/g, str => str.replace(/(\\[{}%#&$_])/g, "\\$1"));
+      .replace(/(?<![\\$])\$(?!\$).+?(?<!\\)\$/g, fixLatex);
 
+    console.log(string);
     const mdString = await new MdParser({}).parse(string);
     if (!this.options.convertMath) {
       return mdString;
